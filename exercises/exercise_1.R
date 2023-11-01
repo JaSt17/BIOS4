@@ -50,9 +50,9 @@ for (i in 1:1000){
 }
 
 # plot the relationship between CV and log_sd
-plot <-ggplot(out, aes(x=out$CV_x_sample, y=out$log_sd_x_sample)) +
+plot <-ggplot(out, aes(x=CV_x_sample, y=log_sd_x_sample)) +
   geom_point(shape=18, size=1, color="blue") +
-  stat_smooth(method=lm, se=FALSE, color="red", size=0.5) +
+  stat_smooth(method=lm, se=FALSE, color="red", lwd=0.5) +
   theme_ipsum() +
   theme(    
     axis.line.x.bottom = element_line(color='black'),
