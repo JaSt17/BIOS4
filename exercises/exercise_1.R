@@ -67,4 +67,12 @@ plot <-ggplot(out, aes(x=CV_x_sample, y=log_sd_x_sample)) +
   xlab("CV") +
   ylab("log(SD)")
 plot
-
+# the plot shows a linear relation between the two factors
+# calculate the correlation coefficient
+cor(out$CV_x_sample,out$log_sd_x_sample)
+# clear linear correlation between the two factors
+# create a proper linear model
+model <- lm(log_sd_x_sample ~ CV_x_sample, data = out)
+# show the model summary
+summary(model)
+# the model shows a significant linear relationship between the two factors
