@@ -12,21 +12,28 @@ alpineplants <- read.csv("~/BIOS4/data/alpineplants.csv")
 names(alpineplants)
 # get rid of the NA values
 alpineplants <- na.omit(alpineplants)
+# get ride of the outliner line in the data
+alpineplants <- alpineplants[alpineplants$min_T_winter > -8,]
 # analyse the factors that have an impact on the growth of the plant Carex.bigelowii
-model_carex <- lm(Carex.bigelowii ~ mean_T_winter + min_T_winter + max_T_winter +
+model_carex <- lm(sqrt(Carex.bigelowii) ~ mean_T_winter + min_T_winter + max_T_winter +
                     mean_T_summer + min_T_summer + max_T_summer +light + snow +
                     soil_moist + altitude , data=alpineplants)
+# get the resiudals from the model
+residuals <- resid(model_carex)
+hist(residuals)
 summary(model_carex)
+anova(model_carex)
 # calculate the multicollinearity
 vif(model_carex)
 # calculate the correlation
 data <- alpineplants[,c("mean_T_winter","min_T_winter","max_T_winter","mean_T_summer",
-                        "min_T_summer","max_T_summer","light","soil_moist","altitude")]
+                        "min_T_summer","max_T_summer","light","snow","soil_moist","altitude")]
 cor(data)
 
 # we see that only 3 factors have an impact are altitude and mean_T_summer
 model_1 <- lm(Carex.bigelowii ~ mean_T_summer + min_T_summer+ altitude, data=alpineplants)
 summary(model_1)
+anova(model_1)
 # calculate the multicollinearity
 vif(model_1)
 # check the correlation of the variables
@@ -44,17 +51,15 @@ model_thalictrum <- lm(Thalictrum.alpinum ~ mean_T_winter + min_T_winter + max_T
                          mean_T_summer + min_T_summer + max_T_summer +light + snow +
                          soil_moist + altitude , data=alpineplants)
 summary(model_thalictrum)
+anova(model_thalictrum)
 # the only two factors that have an impact are summer temperature and winter mean temperature
-model_3 <- lm(Thalictrum.alpinum ~ mean_T_summer + max_T_summer + snow, data=alpineplants)
+model_3 <- lm(Thalictrum.alpinum ~ mean_T_summer + mean_T_winter + max_T_winter, data=alpineplants)
 summary(model_3)
+anova(model_3)
 vif(model_3)
-# look for correlation in the data
-cor(alpineplants$mean_T_summer, alpineplants$max_T_summer)
-cor(alpineplants$mean_T_summer, alpineplants$snow)
-cor(alpineplants$max_T_summer, alpineplants$snow)
 # we see that mean_T_summer and max_T_summer are correlated
 # we can therefore remove one of the variables
-model_4 <- lm(Thalictrum.alpinum ~ snow + mean_T_summer, data=alpineplants)
+model_4 <- lm(Thalictrum.alpinum ~ mean_T_winter + mean_T_summer, data=alpineplants)
 summary(model_4)
 
 
