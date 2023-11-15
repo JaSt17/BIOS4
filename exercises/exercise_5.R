@@ -41,11 +41,7 @@ names(dormancy)
 # get rid of the NA value 
 dormancy <- na.omit(dormancy)
 # create a subdata set
-subdat = dormancy[dormancy$pop=="CC",]
-
-# crate Successes and Failures
-germ = subdat$germ2 * subdat$nseed #Successes
-notgerm = subdat$nseed - germ #Failures
+subdat = dormancy[dormancy$pop=="PM",]
 
 mod1 = glm(germ2 ~ timetosowing + MCseed, "binomial", weights = nseed , data=subdat)
 summary(mod1)
@@ -56,10 +52,6 @@ y_hat = coefs[1,1] + coefs[2,1]*time_pred
 y_hat2 = coefs[1,1] + coefs[2,1]*time_pred - coefs[3,1]*sd(subdat$MCseed)
 y_hat3 = coefs[1,1] + coefs[2,1]*time_pred + coefs[3,1]*sd(subdat$MCseed)
 
-#-------------------------------------
-# transform the data to binary
-y <- rbinom(length(subdat$germ2/subdat$nseed), 1, subdat$germ2/subdat$nseed)
-#--------------------------------------
 # create a new dataframe with the predicted data
 newdata <- data.frame(time_pred = time_pred, y_hat = invlogit(y_hat),
                       y_hat2 = invlogit(y_hat2), y_hat3 = invlogit(y_hat3))
@@ -94,4 +86,4 @@ abline(h=0.5, lty=2)
 # get the corresponding x value for the y=0.5
 x_value = (logit(0.5) - coef[1,1])/coef[2,1]
 abline(v=x_value, lty=2)
-# duration of after-ripening required for the expected germination to be 0.5 is 107 days
+# duration of after-ripening required for the expected germination to be 0.5 is 88 days
