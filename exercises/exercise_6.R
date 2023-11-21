@@ -51,6 +51,8 @@ ggplot(dat, aes(x = Eulaema_nigrita)) +
   ggtitle("Histogram of Eulaema nigrita abundances in the dataset")+
   xlab("Number of Euleama nigrita in the observation")+
   ylab("frequency")
+# save the plot
+ggsave("../plots/Eulaema_nigrita_histogram.png", width = 16, height = 8, units = "cm", dpi = 300)
 # createa a model
 m = glm(Eulaema_nigrita ~ MAP + forest.+ Pseason ,data = dat, family = poisson)
 summary(m)
@@ -120,6 +122,8 @@ plot <- ggplot() +
   xlab("Forest cover") +
   ylab("El. nigrita abundance")
 plot
+# save the plot
+ggsave("../plots/Eulaema_nigrita_forest.png", width = 16, height = 8, units = "cm", dpi = 300)
 # plot the data for Pseason and MAP
 plot <- ggplot() +
   geom_line(data = newdata2, aes(x = Pseason, y = y_hat, color = "MAP = Mean"), linewidth = 1.2) +
@@ -146,3 +150,5 @@ plot <- ggplot() +
   xlab("precipitation seasonality in %") +
   ylab("El. nigrita abundance")
 plot
+# save the plot
+ggsave("../plots/Eulaema_nigrita_Pseason.png", width = 16, height = 8, units = "cm", dpi = 300)
