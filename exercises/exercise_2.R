@@ -32,6 +32,7 @@ library(hrbrthemes)
 # read the data
 birds <- read.delim("~/BIOS4/data/bird_allometry.txt")
 head(birds)
+names(birds)
 
 # create a linear model
 x <- birds$Body.mass..g.
