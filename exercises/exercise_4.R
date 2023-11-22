@@ -88,7 +88,7 @@ blossoms$pop <- as.factor(blossoms$pop)
 subset_blossoms <- blossoms[blossoms$pop == c("S9","S27"),]
 
 # plot GA and UBW for S9 and S27
-plot <-ggplot(subset_blossoms, aes(LBW, UBW, color= pop)) +
+plot <-ggplot(subset_blossoms, aes(ASD, GSD, color= pop)) +
   geom_point() +
   stat_smooth(method = "lm", se = FALSE) +
   theme_ipsum() +
