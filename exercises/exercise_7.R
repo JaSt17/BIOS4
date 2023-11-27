@@ -1,5 +1,6 @@
 # load the package
 library(glmmTMB)
+library(rsq)
 # Variance partitioning with random effect models
 # load the data
 blossoms <- read.csv("~/BIOS4/data/blossoms.csv", header=TRUE)
@@ -40,7 +41,7 @@ Variation in UBW. The variance within groups explains 75 % of the variation in U
 
 # Exercise 2
 # create a model for ASD and GAD with pop
-m1 <- glmmTMB(ASD ~ GAD + (1|pop),REML = FALSE, data = blossoms)
+m1 <- glmmTMB(ASD ~ GAD + (GAD + 1|pop),REML = FALSE, data = blossoms)
 summary(m1)
 VarCorr(m1)
 coef(m1)
