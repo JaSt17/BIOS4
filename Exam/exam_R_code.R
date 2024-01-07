@@ -30,6 +30,7 @@ long_data <- data %>%
 # change the names of the variables
 long_data$variable <- gsub("ExoticPlant_cover", "Exotic herb & grass cover", long_data$variable)
 long_data$variable <- gsub("NativePlant_cover", "Native herb & grass cover", long_data$variable)
+
 # Create the combined histogram plot
 combined_histo <- ggplot(long_data) +
   geom_histogram(aes(x = value, fill = variable), binwidth = 2, alpha = 0.5,
@@ -58,9 +59,9 @@ combined_histo <- ggplot(long_data) +
 # Display the combined plot
 print(combined_histo)
 # save the plot
-ggsave("../Exam/combined_histo.png", width = 16, height = 8, units = "cm", dpi = 300)
-# Try to fit different models on the data
-# interesting abiotic factors are:
+ggsave("C:/Users/jaro_/OneDrive/Dokumente/BIOS4/Exam/combined_histo.png", width = 16, height = 8, units = "cm", dpi = 300)
+
+# Interesting abiotic factors are:
 # 1. annual precipitation (mm)
 # 2. precipitation warmest quarter (mm)
 # 3. precipitation coldest quarter (mm)
@@ -71,13 +72,16 @@ ggsave("../Exam/combined_histo.png", width = 16, height = 8, units = "cm", dpi =
 # 8. Incoming solar radiation in January of the sample year (WH/m2)
 # 9. Incoming solar radiation in July of the sample year (WH/m2)
 
+# adjust the potassium concentration to smaller its per unit change to 10%
+data$K_perc <- data$K_perc*10
+
 # start with native herbs and grass cover
 # try poisson regression first
 model1 <- glm(data = data, NativePlant_cover~annual_precipitation + 
                 precipitation_warmest_quarter + precipitation_coldest_quarter +
                 + MrVBF + K_perc + Th_ppm + U_ppm + SRad_Jan + SRad_Jul, family="poisson")
 summary(model1)
-# Residual deviance: 5377.7  on 336  degrees of freedom <- overdispersion
+# Residual deviance: 5377.7  on 336  degrees of freedom <- over dispersion
 # adjust by using negative binomial
 model2 <- glm.nb(data = data, NativePlant_cover~annual_precipitation + 
                    precipitation_warmest_quarter + precipitation_coldest_quarter +
@@ -109,7 +113,7 @@ lh <- exp(-0.5*AICTab$delta)
 AICTab$w <- round(lh/sum(lh), 2)
 AICTab
 
-# get the summary of the model
+# get the summary of the model with the lowest AIC
 summary(m4)
 anova(m4)
 # Extract coefficients (estimates)
@@ -120,25 +124,27 @@ standard_errors <- summary(m4)$coefficients[, "Std. Error"][-1]
 effects_native <- data.frame(Estimate = coefficients, `Std.Error` = standard_errors)
 # Add the names of the variables
 effects_native$variable <- c("annual precipitation",
-                          "precipitation (warmest quarter)",
-                          "precipitation (coldest quarter)",
-                          "MrVBF", "Potassium (K) in %")
+                          "precipitation(warm)",
+                          "precipitation(cold)",
+                          "MrVBF",
+                          "Potassium (K) in 10%")
 
 # Create the bar plot for the abiotic factors for native herbs and grass cover
 bar1 <- ggplot(effects_native, aes(x = variable, y = Estimate)) +
   geom_bar(aes(y = Estimate), stat = "identity", fill = "#5F7F52", alpha = 0.7, position = "identity") +
   geom_errorbar(aes(ymin = Estimate - Std.Error, ymax = Estimate + Std.Error), width = 0.2, position = "identity", color = "black") +
   geom_hline(yintercept = 0, color = "black", linetype = "dashed") +
-  
+  ylim(-0.22, 0.12) +
   # Customize theme
   theme(    
     axis.line.x.bottom = element_line(color = 'black'),
     axis.line.y.left = element_line(color = 'black'),
     panel.grid.major = element_blank(),
     panel.grid.minor = element_blank(),
+    panel.background = element_rect(fill = "white"),
     plot.title = element_text(size = 8),
     axis.title.x = element_text(size = 8),
-    axis.text.x = element_text(size = 8, angle = 45, hjust = 1),
+    axis.text.x = element_text(size = 8),
     axis.title.y = element_text(size = 8),
     axis.text.y = element_text(size = 8),
     legend.text = element_text(size = 8),
@@ -148,14 +154,14 @@ bar1 <- ggplot(effects_native, aes(x = variable, y = Estimate)) +
   ) +
   
   # Add title and labels
-  ggtitle("Effects of abiotic factors on native herbs and grasses") +
+  ggtitle("Effects of abiotic factors on the % cover of native herbs and grasses") +
   xlab("") +
-  ylab("change on expected log count")
+  ylab("change to the % cover of native herbs and grasses \n per one-unit increase")
 
 # Display the plot
 print(bar1)
 # save the plot
-ggsave("../Exam/native_barplot.png", width = 16, height = 6, units = "cm", dpi = 300)
+ggsave("C:/Users/jaro_/OneDrive/Dokumente/BIOS4/Exam/native_barplot.png", width = 16, height = 7, units = "cm", dpi = 300)
 
 # now repeat it exotic herbs and grass cover
 # try possion first 
@@ -195,12 +201,10 @@ AICTab$delta <- round(AICTab$AIC - min(AICTab$AIC), 2)
 lh <- exp(-0.5*AICTab$delta)
 AICTab$w <- round(lh/sum(lh), 2)
 AICTab
-# scale K_perc to get a better interpretation of the coefficients
-data$K_perc <- data$K_perc*10
-m4 <- glm.nb(data = data, ExoticPlant_cover~annual_precipitation + 
-               precipitation_warmest_quarter + precipitation_coldest_quarter +
-               + MrVBF + K_perc)
+
+# get the summary of the model with the lowest AIC
 summary(m4)
+anova(m4)
 # Extract coefficients (estimates)
 coefficients <- coef(m4)[-1]
 # Extract standard errors
@@ -209,25 +213,27 @@ standard_errors <- summary(m4)$coefficients[, "Std. Error"][-1]
 effects_exotic <- data.frame(Estimate = coefficients, `Std.Error` = standard_errors)
 # Add the names of the variables
 effects_exotic$variable <- c("annual precipitation",
-                             "precipitation (warmest quarter)",
-                             "precipitation (coldest quarter)",
-                             "MrVBF", "Potassium (K) in 10% steps")
+                             "precipitation(warm)",
+                             "precipitation(cold)",
+                             "MrVBF",
+                             "Potassium (K) in 10%")
 
 # Create the bar plot for the abiotic factors for exotic herbs and grass cover
 bar2 <- ggplot(effects_exotic, aes(x = variable ,y = Estimate)) +
   geom_bar(aes(y = Estimate), stat = "identity", fill = "#B99470", alpha = 0.7, position = "identity") +
   geom_errorbar(aes(ymin = Estimate - Std.Error, ymax = Estimate + Std.Error), width = 0.2, position = "identity", color = "black") +
   geom_hline(yintercept = 0, color = "black", linetype = "dashed") +
-  ylim(-0.1, 0.1) +
+  ylim(-0.12, 0.1) +
   # Customize theme
   theme(    
     axis.line.x.bottom = element_line(color = 'black'),
     axis.line.y.left = element_line(color = 'black'),
     panel.grid.major = element_blank(),
     panel.grid.minor = element_blank(),
+    panel.background = element_rect(fill = "white"),
     plot.title = element_text(size = 8),
     axis.title.x = element_text(size = 8),
-    axis.text.x = element_text(size = 8, angle = 45, hjust = 1),
+    axis.text.x = element_text(size = 8),
     axis.title.y = element_text(size = 8),
     axis.text.y = element_text(size = 8),
     legend.text = element_text(size = 8),
@@ -236,7 +242,10 @@ bar2 <- ggplot(effects_exotic, aes(x = variable ,y = Estimate)) +
     legend.key.size = unit(0.3, 'cm')
   ) +
   # Add title and labels
-  ggtitle("Effect of abiotic factors on exotic  herbs and grasses") +
+  ggtitle("Effects of abiotic factors on the % cover of exotic herbs and grasses") +
   xlab("") +
-  ylab("change on expected log count")
+  ylab("change to the % cover of exotic herbs and grasses \n per one-unit increase")
+
 print(bar2)
+# save the plot
+ggsave("C:/Users/jaro_/OneDrive/Dokumente/BIOS4/Exam/exotic_barplot.png", width = 16, height = 7, units = "cm", dpi = 300)
