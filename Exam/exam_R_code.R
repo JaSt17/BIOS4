@@ -154,9 +154,9 @@ bar1 <- ggplot(effects_native, aes(x = variable, y = Estimate)) +
   ) +
   
   # Add title and labels
-  ggtitle("Effects of abiotic factors on the % cover of native herbs and grasses") +
+  ggtitle("Effects of abiotic factors on the log rate of percentual native herbs and grasses cover") +
   xlab("") +
-  ylab("change to the % cover of native herbs and grasses \n per one-unit increase")
+  ylab("change to the log rate per one-unit increase")
 
 # Display the plot
 print(bar1)
@@ -242,9 +242,9 @@ bar2 <- ggplot(effects_exotic, aes(x = variable ,y = Estimate)) +
     legend.key.size = unit(0.3, 'cm')
   ) +
   # Add title and labels
-  ggtitle("Effects of abiotic factors on the % cover of exotic herbs and grasses") +
+  ggtitle("Effects of abiotic factors on the log rate of percentual exotic herbs and grasses cover") +
   xlab("") +
-  ylab("change to the % cover of exotic herbs and grasses \n per one-unit increase")
+  ylab("change to the log rate per one-unit increase")
 
 print(bar2)
 # save the plot
